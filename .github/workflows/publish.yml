@@ -22,10 +22,11 @@ jobs:
     # environment: npm-publish
     steps:
       - uses: actions/checkout@v4
+      # No `registry-url` here: with it, setup-node writes an .npmrc that sends a
+      # placeholder NODE_AUTH_TOKEN, and npm uses that instead of the OIDC exchange.
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
       - run: npm install -g npm@latest   # trusted publishing needs a recent npm CLI
       - name: Build-time input (scenario C)
         if: ${{ vars.BUILD_INPUT_URL != '' }}
