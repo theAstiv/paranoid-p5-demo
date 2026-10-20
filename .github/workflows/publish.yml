@@ -8,6 +8,11 @@ on:
     branches: ["**"]   # scenario B: any branch can publish
     tags: ["v*"]       # scenario D: tag pushes publish too
   workflow_dispatch:
+    inputs:
+      ref:
+        description: "Scenario E: commit, tag or branch to check out and publish (same pattern as real release workflows)"
+        required: false
+        default: ""
 
 permissions:
   id-token: write      # OIDC for npm trusted publishing (provenance is automatic)
@@ -21,6 +26,18 @@ jobs:
     environment: npm-publish
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # Scenario E: on manual dispatch, publish the commit named by `inputs.ref` instead of
+      # the commit that triggered the run. The SLSA predicate still records the trigger commit.
+      - name: Check out inputs.ref (scenario E)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.ref != '' }}
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          sha="$(git rev-parse --verify --quiet "$REF^{commit}" || git rev-parse --verify --quiet "refs/remotes/origin/$REF^{commit}")"
+          git checkout --detach "$sha"
+          echo "publishing $(git rev-parse HEAD) while GITHUB_SHA=$GITHUB_SHA"
       # No `registry-url` here: with it, setup-node writes an .npmrc that sends a
       # placeholder NODE_AUTH_TOKEN, and npm uses that instead of the OIDC exchange.
       - uses: actions/setup-node@v4
