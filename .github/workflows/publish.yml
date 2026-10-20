@@ -16,10 +16,9 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    # Scenario B' (mitigation): uncomment, create the environment in GitHub with a
-    # deployment branch policy of "main only", and set the same environment name in
-    # the npm trusted-publisher config.
-    # environment: npm-publish
+    # Scenario B' (mitigation): GitHub environment `npm-publish` only deploys from main,
+    # and the npm trusted-publisher config requires environment npm-publish.
+    environment: npm-publish
     steps:
       - uses: actions/checkout@v4
       # No `registry-url` here: with it, setup-node writes an .npmrc that sends a
