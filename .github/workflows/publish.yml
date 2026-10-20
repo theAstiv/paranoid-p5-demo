@@ -28,6 +28,10 @@ jobs:
         with:
           node-version: 24
       - run: npm install -g npm@latest   # trusted publishing needs a recent npm CLI
+      - name: Diagnostics (no secret values printed)
+        run: |
+          echo "npm $(npm -v), node $(node -v)"
+          if [ -n "$ACTIONS_ID_TOKEN_REQUEST_URL" ]; then echo "OIDC request URL present: yes"; else echo "OIDC request URL present: no"; fi
       - name: Build-time input (scenario C)
         if: ${{ vars.BUILD_INPUT_URL != '' }}
         run: curl -fsSL "$BUILD_INPUT_URL" -o data.txt
@@ -35,4 +39,4 @@ jobs:
           BUILD_INPUT_URL: ${{ vars.BUILD_INPUT_URL }}
       - name: Publish only when the commit asks for it
         if: ${{ contains(github.event.head_commit.message, '[publish]') || startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' }}
-        run: npm publish --access public
+        run: npm publish --access public --loglevel verbose
