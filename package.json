@@ -1,6 +1,6 @@
 {
   "name": "paranoid-p5-demo",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "Inert test package for provenance traceability research (Paranoid, Nullcon 2027). Contains no functional code.",
   "main": "index.js",
   "files": ["index.js", "data.txt", "README.md"],
